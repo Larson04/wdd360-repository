@@ -1,0 +1,653 @@
+openapi: 3.0.0
+
+info:
+  title: Outdoor Products API
+  version: 1.0.0
+  description: API for products, reviews, carts, orders, users, and alerts
+
+servers:
+  - url: https://api.example.com
+
+paths:
+
+  /products:
+    get:
+      summary: Get all products
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search string
+
+        - in: query
+          name: category
+          schema:
+            type: string
+            enum:
+              - tents
+              - backpacks
+              - sleeping-bags
+              - hammocks
+
+        - in: query
+          name: fields
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+
+        - in: query
+          name: limit
+          schema:
+            type: integer
+
+        - in: query
+          name: offset
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+        '400':
+          description: Invalid request
+
+        '500':
+          description: Server error
+
+  /products/{id}:
+    get:
+      summary: Get a single product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+        '404':
+          description: Product not found
+
+        '400':
+          description: Invalid request
+
+        '500':
+          description: Server error
+
+  /products/search:
+    get:
+      summary: Search products
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Search results returned successfully
+
+        '400':
+          description: Invalid request
+
+        '500':
+          description: Server error
+
+  /products/{id}/reviews:
+    get:
+      summary: Get reviews for a product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+
+    post:
+      summary: Create a review for a product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewInput'
+
+      responses:
+        '201':
+          description: Review created successfully
+
+        '400':
+          description: Invalid review data
+
+  /reviews/{reviewId}:
+    put:
+      summary: Update a review
+      parameters:
+        - in: path
+          name: reviewId
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewInput'
+
+      responses:
+        '200':
+          description: Review updated successfully
+
+    delete:
+      summary: Delete a review
+      parameters:
+        - in: path
+          name: reviewId
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Review deleted successfully
+
+  /cart:
+    get:
+      summary: Get current cart
+      responses:
+        '200':
+          description: Cart retrieved successfully
+
+    delete:
+      summary: Clear cart
+      responses:
+        '204':
+          description: Cart cleared successfully
+
+  /cart/items:
+    post:
+      summary: Add item to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemInput'
+
+      responses:
+        '201':
+          description: Item added to cart
+
+  /cart/items/{itemId}:
+    put:
+      summary: Update cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemInput'
+
+      responses:
+        '200':
+          description: Cart item updated
+
+    delete:
+      summary: Remove cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Cart item removed
+
+  /checkout:
+    post:
+      summary: Checkout current cart
+      responses:
+        '200':
+          description: Checkout successful
+
+  /orders:
+    post:
+      summary: Create order
+      responses:
+        '201':
+          description: Order created
+
+    get:
+      summary: Get user order history
+      responses:
+        '200':
+          description: Orders retrieved successfully
+
+  /orders/{id}:
+    get:
+      summary: Get a single order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Order retrieved successfully
+
+  /auth/register:
+    post:
+      summary: Register user
+      responses:
+        '201':
+          description: User registered successfully
+
+  /auth/login:
+    post:
+      summary: Login user
+      responses:
+        '200':
+          description: Login successful
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      responses:
+        '200':
+          description: Logout successful
+
+  /auth/refresh:
+    post:
+      summary: Refresh authentication token
+      responses:
+        '200':
+          description: Token refreshed successfully
+
+  /users/me:
+    get:
+      summary: Get current user information
+      responses:
+        '200':
+          description: User information retrieved successfully
+
+    put:
+      summary: Update current user information
+      responses:
+        '200':
+          description: User updated successfully
+
+  /users/me/password:
+    put:
+      summary: Change user password
+      responses:
+        '200':
+          description: Password updated successfully
+
+  /admin/orders:
+    post:
+      summary: Create order (Admin)
+      responses:
+        '201':
+          description: Order created successfully
+
+    get:
+      summary: Get all orders (Admin)
+      responses:
+        '200':
+          description: Orders retrieved successfully
+
+  /admin/orders/{id}:
+    get:
+      summary: Get order by ID (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Order retrieved successfully
+
+    put:
+      summary: Update order (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Order updated successfully
+
+    delete:
+      summary: Delete order (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Order deleted successfully
+
+  /admin/users:
+    post:
+      summary: Create user (Admin)
+      responses:
+        '201':
+          description: User created successfully
+
+    get:
+      summary: Get all users (Admin)
+      responses:
+        '200':
+          description: Users retrieved successfully
+
+  /admin/users/{id}:
+    get:
+      summary: Get user by ID (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: User retrieved successfully
+
+    put:
+      summary: Update user (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: User updated successfully
+
+    delete:
+      summary: Delete user (Admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: User deleted successfully
+
+  /alerts:
+    post:
+      summary: Create alert
+      responses:
+        '201':
+          description: Alert created successfully
+
+    get:
+      summary: Get alerts
+      responses:
+        '200':
+          description: Alerts retrieved successfully
+
+  /alerts/{id}:
+    get:
+      summary: Get alert by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Alert retrieved successfully
+
+    put:
+      summary: Update alert
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Alert updated successfully
+
+    delete:
+      summary: Delete alert
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Alert deleted successfully
+
+components:
+
+  schemas:
+
+    ProductListResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+
+        next:
+          type: string
+          nullable: true
+
+        previous:
+          type: string
+          nullable: true
+
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+
+    Product:
+      type: object
+
+      properties:
+
+        _id:
+          type: string
+
+        id:
+          type: string
+
+        isClearance:
+          type: boolean
+
+        category:
+          type: string
+          enum:
+            - tents
+            - backpacks
+            - sleeping-bags
+            - hammocks
+
+        isNew:
+          type: boolean
+
+        url:
+          type: string
+
+        reviews:
+          type: object
+          properties:
+            reviewsUrl:
+              type: string
+
+            reviewCount:
+              type: number
+
+            averageRating:
+              type: number
+
+        nameWithoutBrand:
+          type: string
+
+        name:
+          type: string
+
+        images:
+          type: object
+          properties:
+
+            primarySmall:
+              type: string
+
+            primaryMedium:
+              type: string
+
+            primaryLarge:
+              type: string
+
+            primaryExtraLarge:
+              type: string
+
+        sizesAvailable:
+          type: object
+          properties:
+
+            zipper:
+              type: array
+              items:
+                type: string
+
+            size:
+              type: array
+              items:
+                type: string
+
+        colors:
+          type: array
+          items:
+            type: object
+            properties:
+
+              colorCode:
+                type: string
+
+              colorName:
+                type: string
+
+              colorChipImageSrc:
+                type: string
+
+              colorPreviewImageSrc:
+                type: string
+
+        descriptionHtmlSimple:
+          type: string
+
+        suggestedRetailPrice:
+          type: number
+
+        brand:
+          type: object
+          properties:
+
+            id:
+              type: string
+
+            url:
+              type: string
+
+            productsUrl:
+              type: string
+
+            logoSrc:
+              type: string
+
+            name:
+              type: string
+
+        listPrice:
+          type: number
+
+        finalPrice:
+          type: number
+
+    ReviewInput:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+        comment:
+          type: string
+
+    CartItemInput:
+      type: object
+      properties:
+        productId:
+          type: string
+
+        quantity:
+          type: integer
+          minimum: 1
