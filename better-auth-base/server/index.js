@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import { toNodeHandler } from "better-auth/node";
+import { getAuth, auth } from "./auth.js";
 
 import { initializeDatabase, closeDatabase, getDatabase } from "./database.js";
 
@@ -16,6 +18,11 @@ app.use(
     credentials: true
   })
 );
+
+app.all('/api/auth/{*any}', (req, res) => {
+    const auth = getAuth();
+    return toNodeHandler(auth)(req, res);
+});
 
 // JSON body parsing...
 app.use(express.json());

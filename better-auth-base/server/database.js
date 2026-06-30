@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 
-const client = new MongoClient(process.env.DATABASE_URL);
+export const client = new MongoClient(process.env.DATABASE_URL);
 let db = null;
 
 // Initialize database connection with proper error handling
