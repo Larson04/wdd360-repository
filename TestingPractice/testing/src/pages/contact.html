@@ -1,0 +1,43 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Contact</title>
+  </head>
+  <body>
+    <main>
+      <h1>Contact</h1>
+      <form id="contact-form" aria-label="Contact form">
+        <label>
+          Name
+          <input type="text" name="name" aria-label="Name" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" aria-label="Email" required />
+        </label>
+        <label>
+          Message
+          <textarea name="message" aria-label="Message" required></textarea>
+        </label>
+        <button type="submit">Send</button>
+      </form>
+      <p id="success" hidden>Thanks for your message</p>
+    </main>
+
+    <script>
+      const form = document.querySelector('#contact-form')
+      const success = document.querySelector('#success')
+
+      form?.addEventListener('submit', (event) => {
+        event.preventDefault()
+        if (success) {
+          success.hidden = false
+        }
+      })
+    </script>
+  </body>
+</html>

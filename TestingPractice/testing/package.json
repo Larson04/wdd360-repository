@@ -1,0 +1,20 @@
+{
+  "name": "wdd360-testing-activity",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4322",
+    "test": "pnpm test:unit",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:solutions": "vitest run --config=vitest.solutions.config.ts",
+    "test:integration": "playwright test",
+    "test:integration:ui": "playwright test --ui",
+    "test:integration:solutions": "playwright test --config=playwright.solutions.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "vitest": "^3.2.4"
+  }
+}
